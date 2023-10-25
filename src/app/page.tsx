@@ -124,7 +124,7 @@ export default function Home() {
 
   const navigateToDashboard = async (e: any) => {
     e.preventDefault()
-    // router.push("/dashboard")
+    router.push("/dashboard")
   }
 
   const addEmail = async (email: string) => {
