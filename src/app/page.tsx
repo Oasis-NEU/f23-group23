@@ -4,7 +4,6 @@
 // Import the functions you need from the SDKs you need
 
 import Head from 'next/head';
-import app from './firebase';
 
 import { useEffect, useRef, useState } from 'react';
 
@@ -15,13 +14,75 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, User } from "firebase/aut
 import { useRouter } from 'next/navigation';
 
 
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+import 'firebase/compat/auth';
+
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAVU2hgf1Yv8uEYftVLEZbgps9K2Pebghc",
+  authDomain: "peace-of-mind-c4135.firebaseapp.com",
+  projectId: "peace-of-mind-c4135",
+  storageBucket: "peace-of-mind-c4135.appspot.com",
+  messagingSenderId: "619407910041",
+  appId: "1:619407910041:web:2d4a85f85f8031e2628408",
+  measurementId: "G-6ZFCPF2RCY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+firebase.initializeApp(firebaseConfig);
 const googleProvider = new GoogleAuthProvider()
-const auth = getAuth(app);
+// const auth = getAuth(app);
 
 // Initialize Firestore
-const db = getFirestore(app);
+// const db = getFirestore(app);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+
+db.settings({ timestampsInSnapshots: true });
+
 
 export default function Home() {
+
+  auth.onAuthStateChanged(user => {
+  
+    if (user) {
+        db.collection('users').onSnapshot(snapshot => {
+            //setupGuides(snapshot.docs)
+            //setupUI(user);
+        db.collection("users").doc(user.uid).set({
+          name: user.email,
+          mentalHealth: ["great", "okay"],
+        }).catch((error) => {
+            console.log(error.message)
+        });
+        
+        }, err => {
+           console.log(err.message)
+        });
+        db.collection('users').doc(user.uid).get().then(doc => {
+          console.log(doc.data().mentalHealth)
+        });
+        
+    } else {
+        //setupUI();
+        //setupGuides([]);
+        
+    }
+  
+  })
 
   const [id, setID] = useState("")
   const [user, setUser] = useState<User | null>(auth.currentUser)
@@ -35,17 +96,19 @@ export default function Home() {
 
   const signup = async (e: any) => {
     e.preventDefault()
+    
     signInWithPopup(auth, googleProvider)
-      .then(async (result) => {
+      .then(cred => {
         // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const credential = GoogleAuthProvider.credentialFromResult(cred);
         // The signed-in user info.
-        const u = result.user;
+        const u = cred.user;
         setUser(u)
         navigateToDashboard(e)
         // IdP data available using getAdditionalUserInfo(result)
         // ...
-        await addEmail(u.email!)
+        addEmail(u.email!)
+        
       }).catch((error) => {
         // Handle Errors here.
         const errorCode = error.code;
@@ -55,12 +118,13 @@ export default function Home() {
         // The AuthCredential type that was used.
         const credential = GoogleAuthProvider.credentialFromError(error);
         // ...
+        
       });
   }
 
   const navigateToDashboard = async (e: any) => {
     e.preventDefault()
-    router.push("/dashboard")
+    // router.push("/dashboard")
   }
 
   const addEmail = async (email: string) => {
@@ -77,7 +141,7 @@ export default function Home() {
     }
 
     // storing it in a document on Firestore
-    await setDoc(userRef, userData)
+    
   };
 
   useEffect(() => {
