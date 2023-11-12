@@ -9,11 +9,11 @@ import { useEffect, useRef, useState } from 'react';
 
 // Import the functions you need from the SDKs you need
 
-import { getFirestore, doc, setDoc, Timestamp } from "firebase/firestore"; // firestore module
+import { getFirestore, doc, setDoc, Timestamp, snapshotEqual } from "firebase/firestore"; // firestore module
 import { getAuth, GoogleAuthProvider, signInWithPopup, User } from "firebase/auth";
 import { useRouter } from 'next/navigation';
 
-
+export { Home }
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
@@ -21,7 +21,6 @@ import { getAnalytics } from "firebase/analytics";
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
-
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -43,6 +42,7 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 firebase.initializeApp(firebaseConfig);
 const googleProvider = new GoogleAuthProvider()
+
 // const auth = getAuth(app);
 
 // Initialize Firestore
@@ -50,48 +50,29 @@ const googleProvider = new GoogleAuthProvider()
 const db = firebase.firestore();
 const auth = firebase.auth();
 
+auth.onAuthStateChanged(user => {
+  if (user) {
 
-db.settings({ timestampsInSnapshots: true });
 
+  } else {
+      console.log("signing out")
+  }
+
+})
 
 export default function Home() {
+  // Add beforeunload listener
+  addEventListener("beforeunload", (event) => {
+    firebase.auth().signOut().then(() => {
+      
+    }).catch((error) => {
+      // An error happened.
+    });
+  });
 
-  auth.onAuthStateChanged(user => {
   
-    if (user) {
-        db.collection('users').onSnapshot(snapshot => {
-            //setupGuides(snapshot.docs)
-            //setupUI(user);
-        db.collection("users").doc(user.uid).set({
-          name: user.email,
-          mentalHealth: ["great", "okay"],
-        }).catch((error) => {
-            console.log(error.message)
-        });
-        
-        }, err => {
-           console.log(err.message)
-        });
-        db.collection('users').doc(user.uid).get().then(doc => {
-          console.log(doc.data().mentalHealth)
-        });
-        
-    } else {
-        //setupUI();
-        //setupGuides([]);
-        
-    }
-  
-  })
-
-  const [id, setID] = useState("")
-  const [user, setUser] = useState<User | null>(auth.currentUser)
-
+  const [user, setUser] = useState<User | (() => User | null) | null>();
   // const [status, setStatus] = useState<ResponseStatus>(ResponseStatus.Waiting);
-  const [loading, setLoading] = useState(false);
-
-  const emailInputRef = useRef<HTMLInputElement>(null);
-
   const router = useRouter()
 
   const signup = async (e: any) => {
@@ -124,7 +105,7 @@ export default function Home() {
 
   const navigateToDashboard = async (e: any) => {
     e.preventDefault()
-    router.push("/dashboard")
+    router.push("/chatbot")
   }
 
   const addEmail = async (email: string) => {
@@ -134,20 +115,12 @@ export default function Home() {
     const userRef = doc(db, 'users', email)
 
     // creating user data from auth to be stored
-    const userData = {
-      name: user?.displayName,
-      dataLoggedIn: Timestamp.now(),
-      pfp: user?.photoURL,
-    }
 
     // storing it in a document on Firestore
     
   };
 
-  useEffect(() => {
-    setUser(auth.currentUser)
-  }, [])
-
+  
 
   return (
     <div className="h-full min-h-screen lg:h-screen w-full flex flex-col bg-white">
