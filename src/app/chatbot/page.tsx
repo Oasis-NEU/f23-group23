@@ -51,6 +51,7 @@ interface Message {
   content: string;
 }
 
+var assistantI = "This is where the AI response would go, but it currently does not exist.";
 
 export default function Chat() {
   const router = useRouter;
@@ -83,7 +84,7 @@ export default function Chat() {
         const assistantMessage: Message = { role: "assistant", content: responseData };
 
         setChat([...chat, userMessage, assistantMessage]);
-        var assistantI = assistantMessage["content"]
+        assistantI = assistantMessage["content"]
 
 
 
@@ -97,35 +98,31 @@ export default function Chat() {
 
 
     var date = new Date();
-        var day = date.getDate() + 1
+        var day = date.getDate()
         var month = date.getMonth() + 1
         var year = date.getFullYear()
         var currentDate = year.toString()  +  month.toString() +  day.toString();  
-
+        
         if(user) {
           db.collection("users").doc(user.uid).get().then(doc => {
             const data = doc.data();
             var dict = data![currentDate]
-            var innerlst = []
-            console.log(dict)
             if(dict === undefined){
-              innerlst = [userI, "This is where the first assistant reply would go"]
               db.collection("users").doc(user.uid).update({
                 name: user.email,
-                [currentDate]: {0: [userI, "This is where the first assistant reply would go"]},
+                [currentDate]: {0: [userI, assistantI]},
                 
               })
               
             } else {
-              console.log("IT WORKS HERE")
-              innerlst.push([userI, "This is where assistant reply would go"])
-              dict[parseInt(Object.keys(dict)[Object.keys(dict).length-1]) + 1] = [userI, "This is where assistant reply would go"]
+              dict[parseInt(Object.keys(dict)[Object.keys(dict).length-1]) + 1] = [userI, assistantI]
               db.collection("users").doc(user.uid).update({
                 name: user.email,
                 [currentDate]: dict,
                 
               })
-            }
+              }
+             
           })
     } else {
       console.log("Timed out, need to sign back in")
@@ -133,7 +130,47 @@ export default function Chat() {
     }
   }
 
+  function endOfWeekSummary(){
+    if(user) {
+      db.collection("users").doc(user.uid).get().then(doc => {
+        const data = doc.data()
 
+        // First for loop iterates through each field; which is every different date / day
+        for(let i = 0; i < 7; i++){
+
+          // If there isnt another field, the loop ends
+          if(Object.values(data)[i] === undefined){
+            break
+          }
+          // If the field is just the email, the loop ends
+          if(Object.values(data)[i] == data.name){
+            break
+          }
+          var x = 0
+          
+          // Iterates through every input/output in one day
+          while(true){
+
+            // Loop ends if there is not more inputs/outputs
+            if (Object.values(data)[i][x] === undefined){
+              break
+            } else{
+
+              // This logs the input
+              console.log(Object.values(data)[i][x][0]);
+
+              // This logs the output
+              console.log(Object.values(data)[i][x][1]);
+            }
+            x++
+          }
+          
+        }
+        
+      })
+      
+    }
+  }
   return (
     <div>
       <h1>Hi, I am a chatbot that will help with your mental health, ask me anything!</h1>
