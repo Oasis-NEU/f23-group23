@@ -51,6 +51,7 @@ interface Message {
   content: string;
 }
 
+
 export default function Chat() {
   const router = useRouter;
   const [chat, setChat] = useState<Message[]>([]); // Initialize with an empty array of Message
@@ -96,18 +97,20 @@ export default function Chat() {
 
 
     var date = new Date();
-        var day = date.getDate()
+        var day = date.getDate() + 1
         var month = date.getMonth() + 1
         var year = date.getFullYear()
-        var currentDate = year.toString()  +  month.toString() +  day.toString(); 
-        
+        var currentDate = year.toString()  +  month.toString() +  day.toString();  
+
         if(user) {
           db.collection("users").doc(user.uid).get().then(doc => {
             const data = doc.data();
             var dict = data![currentDate]
+            var innerlst = []
             console.log(dict)
             if(dict === undefined){
-              db.collection("users").doc(user.uid).set({
+              innerlst = [userI, "This is where the first assistant reply would go"]
+              db.collection("users").doc(user.uid).update({
                 name: user.email,
                 [currentDate]: {0: [userI, "This is where the first assistant reply would go"]},
                 
@@ -115,10 +118,11 @@ export default function Chat() {
               
             } else {
               console.log("IT WORKS HERE")
+              innerlst.push([userI, "This is where assistant reply would go"])
               dict[parseInt(Object.keys(dict)[Object.keys(dict).length-1]) + 1] = [userI, "This is where assistant reply would go"]
-              db.collection("users").doc(user.uid).set({
+              db.collection("users").doc(user.uid).update({
                 name: user.email,
-                [currentDate]:  dict,
+                [currentDate]: dict,
                 
               })
             }
