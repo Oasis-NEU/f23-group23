@@ -102,7 +102,7 @@ export default function Chat() {
         var month = date.getMonth() + 1
         var year = date.getFullYear()
         var currentDate = year.toString()  +  month.toString() +  day.toString();  
-        
+        endOfWeekSummary();
         if(user) {
           db.collection("users").doc(user.uid).get().then(doc => {
             const data = doc.data();
@@ -137,7 +137,7 @@ export default function Chat() {
 
         // First for loop iterates through each field; which is every different date / day
         for(let i = 0; i < 7; i++){
-
+          var arr = []
           // If there isnt another field, the loop ends
           if(Object.values(data)[i] === undefined){
             break
@@ -153,17 +153,22 @@ export default function Chat() {
 
             // Loop ends if there is not more inputs/outputs
             if (Object.values(data)[i][x] === undefined){
+              
               break
             } else{
-
+              
               // This logs the input
-              console.log(Object.values(data)[i][x][0]);
+              arr.push({'Role': 'User', "Content": Object.values(data)[i][x][0]});
 
               // This logs the output
-              console.log(Object.values(data)[i][x][1]);
+              arr.push({'Role': 'Assistant', "Content": Object.values(data)[i][x][1]});
+              
             }
             x++
           }
+
+          // This array contains the conversation of one day in the correct format.
+          console.log(arr)
           
         }
         
@@ -184,7 +189,7 @@ export default function Chat() {
         })}
       </div>
       <form onSubmit={handleSubmit}>
-        <input style={{ color: 'black' }} type="text" value={userInput} onChange={(event) => { setUserInput(event.target.value) }} />
+      <input style={{ color: 'black' }} type="text" value={userInput} onChange={(event) => { setUserInput(event.target.value) }} />
         <input type="submit" value="Submit!" />
       </form>
     </div>
