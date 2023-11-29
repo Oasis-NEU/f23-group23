@@ -63,7 +63,7 @@ export default function Chat() {
     e.preventDefault();
 
     const userMessage: Message = { role: "user", content: userInput };
-
+    setUserInput("");
     const message = [...chat, userMessage];
 
     var userI  = userMessage["content"];
@@ -184,7 +184,7 @@ export default function Chat() {
         })}
       </div>
       <form onSubmit={handleSubmit}>
-        <input style={{ color: 'black' }} type="text" onChange={(event) => { setUserInput(event.target.value) }} />
+        <input style={{ color: 'black' }} type="text" value={userInput} onChange={(event) => { setUserInput(event.target.value) }} />
         <input type="submit" value="Submit!" />
       </form>
     </div>
