@@ -103,7 +103,7 @@ export default function Chat() {
         var month = date.getMonth() + 1
         var year = date.getFullYear()
         var currentDate = year.toString()  +  month.toString() +  day.toString();  
-        endOfWeekSummary();
+        
         if(user) {
           db.collection("users").doc(user.uid).get().then(doc => {
             const data = doc.data();
@@ -123,12 +123,14 @@ export default function Chat() {
                 
               })
               }
-             
+              endOfWeekSummary();
           })
     } else {
       console.log("Timed out, need to sign back in")
       window.location.href = "http://localhost:3000";
     }
+
+    
   }
 
   function endOfWeekSummary(){
