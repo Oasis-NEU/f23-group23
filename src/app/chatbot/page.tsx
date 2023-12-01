@@ -8,6 +8,7 @@ import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 
 import { useRouter } from 'next/navigation';
+import { List } from "postcss/lib/list";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -131,6 +132,7 @@ export default function Chat() {
   }
 
   function endOfWeekSummary(){
+    var weekArr : Object[] = [];
     if(user) {
       db.collection("users").doc(user.uid).get().then(doc => {
         const data = doc.data()
@@ -169,9 +171,12 @@ export default function Chat() {
 
           // This array contains the conversation of one day in the correct format.
           console.log(arr)
+          var w = arr
+          weekArr.push(arr)
           
         }
-        
+        weekArr.splice(0, 1);
+        console.log(weekArr)
       })
       
     }
