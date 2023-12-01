@@ -103,6 +103,12 @@ export default function Chat() {
         var month = date.getMonth() + 1
         var year = date.getFullYear()
         var currentDate = year.toString()  +  month.toString() +  day.toString();  
+        if(currentDate.length == 8){
+
+        } else {
+          currentDate = currentDate + "1"
+        }
+        
         
         if(user) {
           db.collection("users").doc(user.uid).get().then(doc => {
@@ -138,10 +144,11 @@ export default function Chat() {
     if(user) {
       db.collection("users").doc(user.uid).get().then(doc => {
         const data = doc.data()
-
+        
         // First for loop iterates through each field; which is every different date / day
         for(let i = 0; i < 7; i++){
           var arr = []
+
           // If there isnt another field, the loop ends
           if(Object.values(data)[i] === undefined){
             break
@@ -172,12 +179,12 @@ export default function Chat() {
           }
 
           // This array contains the conversation of one day in the correct format.
+          console.log("DAY")
           console.log(arr)
-          var w = arr
           weekArr.push(arr)
           
         }
-        weekArr.splice(0, 1);
+        console.log("WEEK")
         console.log(weekArr)
       })
       
