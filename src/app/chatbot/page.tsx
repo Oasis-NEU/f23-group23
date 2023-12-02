@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import Link from 'next/link';
 // Import the functions you need from the SDKs you need
 
 import { initializeApp } from "firebase/app";
@@ -53,6 +54,61 @@ interface Message {
 }
 
 var assistantI = "This is where the AI response would go, but it currently does not exist.";
+
+export function endOfWeekSummary(){
+  var weekArr : Object[] = [];
+  if(user) {
+    db.collection("users").doc(user.uid).get().then(doc => {
+      const data = doc.data()
+      
+      // First for loop iterates through each field; which is every different date / day
+      for(let i = 0; i < 7; i++){
+        var arr = []
+
+        // If there isnt another field, the loop ends
+        if(Object.values(data)[i] === undefined){
+          break
+        }
+        // If the field is just the email, the loop ends
+        if(Object.values(data)[i] == data.name){
+          break
+        }
+        var x = 0
+        
+        // Iterates through every input/output in one day
+        while(true){
+
+          // Loop ends if there is not more inputs/outputs
+          if (Object.values(data)[i][x] === undefined){
+            
+            break
+          } else{
+            
+            // This logs the input
+            arr.push({'Role': 'User', "Content": Object.values(data)[i][x][0]});
+
+            // This logs the output
+            arr.push({'Role': 'Assistant', "Content": Object.values(data)[i][x][1]});
+            
+          }
+          x++
+        }
+
+        // This array contains the conversation of one day in the correct format.
+        console.log("DAY")
+        console.log(arr)
+        weekArr.push(arr)
+        
+      }
+      console.log("WEEK")
+      console.log(weekArr)
+      
+    
+    })
+    
+  }
+  return weekArr
+}
 
 export default function Chat() {
   const router = useRouter;
@@ -139,60 +195,11 @@ export default function Chat() {
     
   }
 
-  function endOfWeekSummary(){
-    var weekArr : Object[] = [];
-    if(user) {
-      db.collection("users").doc(user.uid).get().then(doc => {
-        const data = doc.data()
-        
-        // First for loop iterates through each field; which is every different date / day
-        for(let i = 0; i < 7; i++){
-          var arr = []
-
-          // If there isnt another field, the loop ends
-          if(Object.values(data)[i] === undefined){
-            break
-          }
-          // If the field is just the email, the loop ends
-          if(Object.values(data)[i] == data.name){
-            break
-          }
-          var x = 0
-          
-          // Iterates through every input/output in one day
-          while(true){
-
-            // Loop ends if there is not more inputs/outputs
-            if (Object.values(data)[i][x] === undefined){
-              
-              break
-            } else{
-              
-              // This logs the input
-              arr.push({'Role': 'User', "Content": Object.values(data)[i][x][0]});
-
-              // This logs the output
-              arr.push({'Role': 'Assistant', "Content": Object.values(data)[i][x][1]});
-              
-            }
-            x++
-          }
-
-          // This array contains the conversation of one day in the correct format.
-          console.log("DAY")
-          console.log(arr)
-          weekArr.push(arr)
-          
-        }
-        console.log("WEEK")
-        console.log(weekArr)
-      })
-      
-    }
-  }
+  
   return (
     <div>
       <h1>Hi, I am a chatbot that will help with your mental health, ask me anything!</h1>
+      <Link href="/summary">Summary</Link>
       <div>
         {chat.map((message, index) => {
           return (
@@ -209,3 +216,5 @@ export default function Chat() {
     </div>
   )
 }
+
+

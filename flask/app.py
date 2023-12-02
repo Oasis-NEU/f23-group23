@@ -3,7 +3,7 @@ import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS, cross_origin
 
-#how to fix this flask error
+# how to fix this flask error
 API_KEY = open("key.txt", "r").read()
 openai.api_key = API_KEY
 
@@ -18,6 +18,7 @@ if __name__ == "__main__":
 #         {"role": "user", "content": "I am feeling sad today"}
 #     ]
 
+
 @app.route('/openai/chat', methods=['POST'])
 @cross_origin(origin="*")
 def add_response():
@@ -25,16 +26,17 @@ def add_response():
 
     print(convo)
     convo.insert(0, {
-        "role": "system", 
-        "content": "You are a mental health chatbot that will assist with answering mental health questions.  Limit the response to a maximum of 4 sentences"
-        })
+        "role": "system",
+        "content": "You are an advanced mental health chatbot that will assist with answering mental health questions.  Your answers will be sophisticated with the aim of always helping the patient if they are feeling down, unsatisfied, unhappy, etc in some way, where you will give them mental health advice to help improve their situation.  Limit the response to a maximum of 8 sentences"
+    })
     # convo = json.loads(convo)
     assistant_response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo", 
-        messages= convo
+        model="gpt-3.5-turbo",
+        messages=convo
     )
 
-    assistant_response =  assistant_response['choices'][0]['message']['content'].strip("\n").strip()
+    assistant_response = assistant_response['choices'][0]['message']['content'].strip(
+        "\n").strip()
     return jsonify(assistant_response)
 
 
@@ -43,3 +45,6 @@ def add_response():
 def test():
     return "working"
 
+# @app.route('/summary', methods=['POST'])
+# def summary():
+#     convo = request.get_json()
