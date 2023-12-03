@@ -3,6 +3,7 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyAVU2hgf1Yv8uEYftVLEZbgps9K2Pebghc",
   authDomain: "peace-of-mind-c4135.firebaseapp.com",
@@ -17,23 +18,17 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
-var user: { uid: string | undefined; email: any; };
+//var user: { uid: string | undefined; email: any; };
 
-auth.onAuthStateChanged(userN => {
 
-  if (userN) {
-      user = userN
-
-  } else {
-      console.log("signing out")
-  }
-
-})
-
-export function endOfWeekSummary(){
+var user  = firebase.auth().currentUser
+console.log(user)
+function endOfWeekSummary(){
     var weekArr : Object[] = [];
+    console.log("1")
     if(user) {
-      db.collection("users").doc(user.uid).get().then(doc => {
+       console.log('2')
+       db.collection("users").doc(user.uid).get().then(doc => {
         const data = doc.data()
         
         // First for loop iterates through each field; which is every different date / day
@@ -77,15 +72,15 @@ export function endOfWeekSummary(){
         }
         console.log("WEEK")
         console.log(weekArr)
-        
       
       })
       
     }
     return weekArr
 }
-
 let weekArr = endOfWeekSummary()
+
+console.log(weekArr)
 let newweekArr = [];
 for (let x = 0; x < weekArr.length; x++) {
     newweekArr.push({Role:'User', Content:'New Day'})
