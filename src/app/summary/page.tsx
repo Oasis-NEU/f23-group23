@@ -2,7 +2,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import 'firebase/compat/auth';
-
+import {useState} from 'react';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAVU2hgf1Yv8uEYftVLEZbgps9K2Pebghc",
@@ -93,5 +93,16 @@ console.log("NEW WEEK")
 console.log(newweekArr);
 
 export default function Summary() {
+  
+  const [summary, setSummary] = useState("");
+  const handleClick = (e:any) => {
     
+      setSummary("Throughout the week, you were mostly in a good mood, enjoying genuine moments of happiness and contentment. Your days were filled with smiles, laughter, and an overall sense of joy. However, here and there, you also had some moments when you felt a bit down and kind of sad. During those times, you might have seemed a bit more thoughtful or deep in your thoughts. Despite these occasional shifts in mood, your week was a mix of positive vibes, showing that you can find joy in different moments, even when dealing with those occasional bouts of feeling a bit low.")
+  }
+  return (
+  <div>
+    <button onClick={handleClick}>Get summary</button>
+    <div>{summary}</div>
+  </div>
+  )
 }
